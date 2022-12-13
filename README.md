@@ -1,5 +1,7 @@
 # Custom Data Source
-This project provides mock data using MockNeat using Spark Data Source V2 API.
+This project provides library to create mock data using [MockNeat](https://www.mockneat.com/) and Spark Data Source V2 API.
+
+It is useful in case you would like to test your spark application with the custom business model and would like to generate random data generation.
 
 ## Batch DataSource
 
@@ -32,3 +34,7 @@ option(BatchMockOptions.SCHEMA_CLASS_NAME, "com.ms.hdi.spark.datasource.batch.mo
 option(BatchMockOptions.DATA_GEN_OBJECT_NAME, "com.ms.hdi.spark.datasource.batch.model.CustomerObj").
 load()
 ```
+
+## Stream Data Source
+
+--- Work in progress
