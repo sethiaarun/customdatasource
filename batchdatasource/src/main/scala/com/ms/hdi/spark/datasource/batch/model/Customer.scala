@@ -22,10 +22,11 @@ object CustomerObj extends DataGenObj {
   /**
    * generate data using mockneat
    * @param mockNeat
+   * @param index
    * @return
    */
-  def generateData(mockNeat: MockNeat): Customer = {
-    Customer(mockNeat.ints().get(),
+  def generateData(mockNeat: MockNeat,index:Int): Customer = {
+    Customer(index,
       mockNeat.names().full().get(),
       mockNeat.names().first().get(),
       mockNeat.names().last().get(),

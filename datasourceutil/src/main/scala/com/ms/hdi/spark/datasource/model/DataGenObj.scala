@@ -11,7 +11,8 @@ trait DataGenObj {
    * generate data using mockneat
    *
    * @param mockNeat
+   * @param index
    * @return
    */
-  def generateData(mockNeat: MockNeat): BaseDataGen
+  def generateData(mockNeat: MockNeat, index:Int): BaseDataGen
 }

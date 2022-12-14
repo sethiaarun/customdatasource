@@ -23,8 +23,12 @@ object BatchMockOptions {
   /**
    * number of records to generate
    */
+  val NUM_OF_RECORDS = "datagen.num.records"
 
-  val NUM_OF_RECORDS = "datagen.numOfRecords"
+  /**
+   * number of records to generate
+   */
+  val NUM_OF_PARTITIONS = "datagen.num.partitions"
 
 
   /**
@@ -32,8 +36,17 @@ object BatchMockOptions {
    * @param properties
    * @return
    */
-  def getTotalNumberOfRecords(properties: JMap[String, String]): Long = {
-    properties.getOrDefault(NUM_OF_RECORDS,"0").toLong
+  def getTotalNumberOfRecords(properties: JMap[String, String]): Int = {
+    properties.getOrDefault(NUM_OF_RECORDS,"0").toInt
+  }
+
+  /**
+   * get number of partitions
+   * @param properties
+   * @return
+   */
+  def getNumOfPartitions(properties: JMap[String, String]): Int = {
+    properties.getOrDefault(NUM_OF_PARTITIONS,"1").toInt
   }
 
 

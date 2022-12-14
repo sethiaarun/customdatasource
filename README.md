@@ -16,6 +16,9 @@ The data source has the following configuration options:
 - `BatchMockOptions.SCHEMA_CLASS_NAME` -> case class name for Schema/Model (with full package name)
 - `BatchMockOptions.DATA_GEN_OBJECT_NAME` -> data generation as per Schema/Model (with full package name)
 - `BatchMockOptions.NUM_OF_RECORDS` -> number of records to be generated
+- `BatchMockOptions.NUM_OF_PARTITIONS` -> number of partitions
+
+Each partition will have `BatchMockOptions.NUM_OF_RECORDS/BatchMockOptions.NUM_OF_PARTITIONS` records.
 
 The code for generating customer data using Spark:
 
@@ -27,12 +30,17 @@ val spark = SparkSession
 .config(sparkConf)
 .appName("DataGenExample").getOrCreate()
 
-val data = spark.read.
-format("com.ms.hdi.spark.datasource.batch.mock").
-option(BatchMockOptions.NUM_OF_RECORDS, "100").
-option(BatchMockOptions.SCHEMA_CLASS_NAME, "com.ms.hdi.spark.datasource.batch.model.Customer").
-option(BatchMockOptions.DATA_GEN_OBJECT_NAME, "com.ms.hdi.spark.datasource.batch.model.CustomerObj").
-load()
+val data: DataFrame = spark.read.
+  format("com.ms.hdi.spark.datasource.batch.mock").
+  option(BatchMockOptions.NUM_OF_RECORDS, "100").
+  option(BatchMockOptions.SCHEMA_CLASS_NAME, "com.ms.hdi.spark.datasource.batch.model.Customer").
+  option(BatchMockOptions.DATA_GEN_OBJECT_NAME, "com.ms.hdi.spark.datasource.batch.model.CustomerObj").
+  option(BatchMockOptions.NUM_OF_PARTITIONS, "4").
+  load()
+
+data.show(false)
+
+println("Number of partitions ${data.rdd.getNumPartitions}")
 ```
 
 ## Stream Data Source

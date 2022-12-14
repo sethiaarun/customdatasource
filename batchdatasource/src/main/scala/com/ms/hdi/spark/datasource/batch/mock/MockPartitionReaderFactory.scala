@@ -16,5 +16,6 @@ class MockPartitionReaderFactory(val userSchema: StructType, val properties: JMa
    * @param partition
    * @return
    */
-  override def createReader(partition: InputPartition): PartitionReader[InternalRow] = new MockPartitionReader(userSchema, properties)
+  override def createReader(partition: InputPartition): PartitionReader[InternalRow] =
+    new MockPartitionReader(userSchema, properties,partition.asInstanceOf[MockPartition])
 }

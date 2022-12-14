@@ -1,6 +1,6 @@
 package com.ms.hdi.spark.datasource.util
 
-import com.ms.hdi.spark.datasource.model.{BaseDataGen, DataGenObj}
+import com.ms.hdi.spark.datasource.model.DataGenObj
 
 import scala.reflect.runtime.universe
 
