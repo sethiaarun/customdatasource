@@ -9,7 +9,7 @@ The Batch data source will create data in batch format. Developers need to provi
 
 The user can generate data sources based on their business scenario. First, the user needs to provide a business model in the form of a case class and a companion object. The companion object will have a definition of how to generate values for the given business domain using MockNeat.
 
-The data source schema will be derived at run time from the case class; that should extend from [`com.ms.hdi.spark.datasource.model.BaseDataGen`](datasourceutil/src/main/scala/com/ms/hdi/spark/datasource/model/BaseDataGen), and the companion object should extend from [`com.ms.hdi.spark.datasource.model.DataGenObj`](datasourceutil/src/main/scala/com/ms/hdi/spark/datasource/model/DataGenObj).
+The data source schema will be derived at run time from the case class; that should extend from [`com.ms.hdi.spark.datasource.model.BaseDataGen`](datasourceutil/src/main/scala/com/ms/hdi/spark/datasource/model/BaseDataGen.scala), and the companion object should extend from [`com.ms.hdi.spark.datasource.model.DataGenObj`](datasourceutil/src/main/scala/com/ms/hdi/spark/datasource/model/DataGenObj.scala).
 
 For example, the customer model is defined using [`com.ms.hdi.spark.datasource.batch.model.Customer`](batchdatasource/src/main/scala/com/ms/hdi/spark/datasource/batch/model/Customer.scala), and the data generation object is defined by `com.ms.hdi.spark.datasource.batch.model.CustomerObj`.
 
