@@ -1,6 +1,7 @@
 package com.ms.hdi.spark.datasource.model
 
 import net.andreinc.mockneat.MockNeat
+import net.andreinc.mockneat.abstraction.MockUnit
 
 /**
  * base trait to generate data for given model
@@ -8,11 +9,10 @@ import net.andreinc.mockneat.MockNeat
 trait DataGenObj {
 
   /**
-   * generate data using mockneat
-   *
-   * @param mockNeat
-   * @param index
+   * Mockneat List of Parameters for the case class or Bean
+   * The MockUnit is going to use the same to create the mockUnit
    * @return
    */
-  def generateData(mockNeat: MockNeat, index:Int): BaseDataGen
+  def mockNeatParameters: (MockNeat, Int) => List[Object]
+
 }

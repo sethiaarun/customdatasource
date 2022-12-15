@@ -12,24 +12,20 @@ import net.andreinc.mockneat.MockNeat
  * @param lastName
  * @param userName
  */
-case class Customer(var customerId: Int, var customerName: String, var firstName: String,
-                    var lastName: String, var userName: String) extends BaseDataGen
+case class Customer(customerId: Int, customerName: String, firstName: String,
+                    lastName: String, userName: String, email: String) extends BaseDataGen
 
 /**
  * customer object, we need this companion object to generate data using mockneat
+ * This object is require to define how to fill mock values for model properties
  */
 object CustomerObj extends DataGenObj {
-  /**
-   * generate data using mockneat
-   * @param mockNeat
-   * @param index
-   * @return
-   */
-  def generateData(mockNeat: MockNeat,index:Int): Customer = {
-    Customer(index,
-      mockNeat.names().full().get(),
-      mockNeat.names().first().get(),
-      mockNeat.names().last().get(),
-      mockNeat.users().get())
-  }
+  val mockNeatParameters: (MockNeat, Int) => List[Object] = (mockNeat: MockNeat, index:Int) => List(
+    mockNeat.intSeq.start(index).increment(1), // customerId
+    mockNeat.names().full(),
+    mockNeat.names().first(),
+    mockNeat.names().last(),
+    mockNeat.users(),
+    mockNeat.emails()
+  )
 }

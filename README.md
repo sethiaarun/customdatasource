@@ -7,9 +7,11 @@ It is useful in case you would like to test your spark application with the cust
 
 The Batch data source will create data in batch format. Developers need to provide business model schema as a Scala case class.
 
-For data generation for a given schema, the user should provide an object extending from `com.ms.hdi.spark.datasource.model.DataGenObj`.
+The user can generate data sources based on their business scenario. First, the user needs to provide a business model in the form of a case class and a companion object. The companion object will have a definition of how to generate values for the given business domain using MockNeat.
 
-For example, the customer model is defined using `com.ms.hdi.spark.datasource.batch.model.Customer`, and the data generation object is defined by `com.ms.hdi.spark.datasource.batch.model.CustomerObj`.
+The data source schema will be derived at run time from the case class; that should extend from `com.ms.hdi.spark.datasource.model.BaseDataGen`), and the companion object should extend from `com.ms.hdi.spark.datasource.model.DataGenObj`.
+
+For example, the customer model is defined using [`com.ms.hdi.spark.datasource.batch.model.Customer`](batchdatasource/src/main/scala/com/ms/hdi/spark/datasource/batch/model/Customer.scala), and the data generation object is defined by `com.ms.hdi.spark.datasource.batch.model.CustomerObj`.
 
 The data source has the following configuration options:
 
@@ -32,16 +34,16 @@ val spark = SparkSession
 
 val data: DataFrame = spark.read.
   format("com.ms.hdi.spark.datasource.batch.mock").
-  option(BatchMockOptions.NUM_OF_RECORDS, "100").
-  option(BatchMockOptions.SCHEMA_CLASS_NAME, "com.ms.hdi.spark.datasource.batch.model.Customer").
-  option(BatchMockOptions.DATA_GEN_OBJECT_NAME, "com.ms.hdi.spark.datasource.batch.model.CustomerObj").
-  option(BatchMockOptions.NUM_OF_PARTITIONS, "4").
+  option(BatchMockOptions.NUM_OF_RECORDS, "<<total number of records>>").
+  option(BatchMockOptions.SCHEMA_CLASS_NAME, "<<your case class full qualified name>>").
+  option(BatchMockOptions.DATA_GEN_OBJECT_NAME, "<<companion object>>").
+  option(BatchMockOptions.NUM_OF_PARTITIONS, "<<total number of partitions>>").
   load()
 
 data.show(false)
-
-println("Number of partitions ${data.rdd.getNumPartitions}")
 ```
+
+
 
 ## Stream Data Source
 
