@@ -1,0 +1,2 @@
+# Mock Datasource Batch Service. This allows users to give the data source alias as the format type over the fully qualified class name.
+com.ms.hdi.spark.datasource.mock.batch.BatchMockDataSource

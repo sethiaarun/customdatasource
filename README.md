@@ -11,7 +11,7 @@ The user can generate data sources based on their business scenario. First, the 
 
 The data source schema will be derived at run time from the case class; that should extend from [`com.ms.hdi.spark.datasource.model.BaseDataGen`](datasourceutil/src/main/scala/com/ms/hdi/spark/datasource/model/BaseDataGen.scala), and the companion object should extend from [`com.ms.hdi.spark.datasource.model.DataGenObj`](datasourceutil/src/main/scala/com/ms/hdi/spark/datasource/model/DataGenObj.scala).
 
-For example, the customer model is defined using [`com.ms.hdi.spark.datasource.batch.model.Customer`](batchdatasource/src/main/scala/com/ms/hdi/spark/datasource/batch/model/Customer.scala), and the data generation object is defined by `com.ms.hdi.spark.datasource.batch.model.CustomerObj`.
+For example, the customer model is defined using [`com.ms.hdi.spark.datasource.model.example.Customer`](datasourceutil/src/main/scala/com/ms/hdi/spark/datasource/model/example/Customer.scala), and the data generation object is defined by `com.ms.hdi.spark.datasource.model.example.CustomerObj`.
 
 The data source has the following configuration options:
 
@@ -25,6 +25,10 @@ Each partition will have `BatchMockOptions.NUM_OF_RECORDS/BatchMockOptions.NUM_O
 The code for generating customer data using Spark:
 
 ```scala
+import com.ms.hdi.spark.datasource.mock.batch.BatchMockOptions
+import com.ms.hdi.spark.datasource.mock.constants.MockDataUtils
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.{DataFrame, SparkSession}
 val sparkConf = new SparkConf()
 sparkConf.set("spark.master", "local")
 val spark = SparkSession
@@ -33,7 +37,7 @@ val spark = SparkSession
 .appName("DataGenExample").getOrCreate()
 
 val data: DataFrame = spark.read.
-  format("com.ms.hdi.spark.datasource.batch.mock").
+  format(MockDataUtils.BATCH_ALT_NAME).
   option(BatchMockOptions.NUM_OF_RECORDS, "<<total number of records>>").
   option(BatchMockOptions.SCHEMA_CLASS_NAME, "<<your case class full qualified name>>").
   option(BatchMockOptions.DATA_GEN_OBJECT_NAME, "<<companion object>>").
