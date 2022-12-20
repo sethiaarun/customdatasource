@@ -88,3 +88,34 @@ data.writeStream
 ```
 
 Developer can extend both Stream and Batch further based on your need.
+
+### Complex Schema
+
+For complex schemas, such as
+
+```scala
+
+case class Car(brandName:String)
+
+case class Customer(customerId: Int, customerName: String, firstName: String,
+                    lastName: String, userName: String, email: String, car:Car) extends BaseDataGen
+```
+
+We have two options:
+
+1. Use MockNeat Transformation to transform parameter to object, for example:
+```scala
+
+  import com.ms.hdi.spark.datasource._
+  val carFn = (s:String)=>Car(s)
+  val mockNeatParameters: (MockNeat, Int) => List[Object] = (mockNeat: MockNeat, index:Int) => List(
+    mockNeat.intSeq.start(index).increment(1), // customerId
+    mockNeat.names().full(),
+    mockNeat.names().first(),
+    mockNeat.names().last(),
+    mockNeat.users(),
+    mockNeat.emails(),
+    mockNeat.cars().brands().map(toJavaFunction(carFn))
+  )
+```
+2. Create a custom MockUnit for the inner object (in this case ```Car``` )
