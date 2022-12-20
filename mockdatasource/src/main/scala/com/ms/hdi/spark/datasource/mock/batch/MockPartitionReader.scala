@@ -1,5 +1,6 @@
 package com.ms.hdi.spark.datasource.mock.batch
 
+import com.ms.hdi.spark.datasource.mock.options.BatchMockOptions
 import com.ms.hdi.spark.datasource.model.BaseDataGen
 import com.ms.hdi.spark.datasource.util.ReflectionUtil
 import net.andreinc.mockneat.MockNeat
@@ -32,6 +33,8 @@ class MockPartitionReader(val userSchema: StructType,
   // end index for data generation
   private val endIndexMockNeat: Int = mockPartition.partSeedValue + mockPartition.partitionNumOfRecords
 
+  private val encoder = getEncoder();
+  private var nextRow: InternalRow = _
   /**
    * mock neat
    */
@@ -44,7 +47,20 @@ class MockPartitionReader(val userSchema: StructType,
     ReflectionUtil.getMockUnit(BatchMockOptions.getDataGenObjectName(properties),schemaClass, mockNeat,mockPartition.partSeedValue)
 
   // find how many we have to create
-  def next() = index < endIndexMockNeat
+  override def next(): Boolean = {
+    if(index < endIndexMockNeat) {
+      val row: InternalRow = encoder.createSerializer().apply(mockUnit.get())
+      if(row!=null) {
+        nextRow = row
+        index+=1
+        true
+      } else {
+        false
+      }
+    } else  {
+      false
+    }
+  }
 
   /**
    * get next record
@@ -52,10 +68,8 @@ class MockPartitionReader(val userSchema: StructType,
    * @return
    */
   def get(): InternalRow = {
-    val encoder = getEncoder()
-    val row: InternalRow = encoder.createSerializer().apply(mockUnit.get())
-    index = index + 1
-    row
+    assert(nextRow != null)
+    nextRow
   }
 
   def close() = Unit

@@ -15,7 +15,6 @@ import java.util.{Map => JMap}
  */
 class MockTable(val userSchema: StructType, val userProperties: JMap[String, String]) extends Table with SupportsRead {
 
-
   /**
    * Scan Builder
    * @param caseInsensitiveStringMap
@@ -28,7 +27,7 @@ class MockTable(val userSchema: StructType, val userProperties: JMap[String, Str
    *
    * @return
    */
-  override def name(): String = "MockCustomerTable"
+  override def name(): String = "MockBatchTable"
 
   /**
    * customer schema
@@ -43,6 +42,7 @@ class MockTable(val userSchema: StructType, val userProperties: JMap[String, Str
    * @return
    */
   override def capabilities(): util.Set[TableCapability] = {
-    Set(TableCapability.BATCH_READ).asJava
+    import TableCapability._
+    Set(BATCH_READ).asJava
   }
 }

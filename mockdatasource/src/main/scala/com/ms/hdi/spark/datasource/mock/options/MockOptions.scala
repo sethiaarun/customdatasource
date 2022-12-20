@@ -1,14 +1,22 @@
 package com.ms.hdi.spark.datasource.mock.options
 
+import com.ms.hdi.spark.datasource.model.BaseDataGen
 import com.ms.hdi.spark.datasource.util.ReflectionUtil
+import net.andreinc.mockneat.MockNeat
+import net.andreinc.mockneat.abstraction.MockUnit
+import net.andreinc.mockneat.types.enums.RandomType
+import org.apache.spark.sql.catalyst.ScalaReflection
+import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
+import org.apache.spark.sql.catalyst.expressions.Expression
+import org.apache.spark.sql.catalyst.util.CaseInsensitiveMap
 
-import java.util.{Map => JMap}
-import scala.reflect.runtime.{universe => ru}
+import scala.reflect.ClassTag
+import scala.reflect.runtime.universe
 
-/**
- * Mock data source options
- */
 trait MockOptions {
+
+  import java.util.{Map => JMap}
+  import scala.reflect.runtime.{universe => ru}
 
   /**
    * schema class name, It can be primitive type or case class
@@ -19,38 +27,6 @@ trait MockOptions {
    * data generation object name
    */
   val DATA_GEN_OBJECT_NAME = "datagen.object.name"
-
-  /**
-   * number of records to generate
-   */
-  val NUM_OF_RECORDS = "datagen.num.records"
-
-  /**
-   * number of records to generate
-   */
-  val NUM_OF_PARTITIONS = "datagen.num.partitions"
-
-
-  /**
-   * get total number of records
-   *
-   * @param properties
-   * @return
-   */
-  def getTotalNumberOfRecords(properties: JMap[String, String]): Int = {
-    properties.getOrDefault(NUM_OF_RECORDS, "0").toInt
-  }
-
-  /**
-   * get number of partitions
-   *
-   * @param properties
-   * @return
-   */
-  def getNumOfPartitions(properties: JMap[String, String]): Int = {
-    properties.getOrDefault(NUM_OF_PARTITIONS, "1").toInt
-  }
-
 
   /**
    * get schema class name for given map
@@ -79,4 +55,72 @@ trait MockOptions {
     ReflectionUtil.getTypeFromStringClassName(getSchemaClassName(properties))
   }
 
+  /**
+   * validate all mandatory required options
+   * @param params
+   * @return
+   */
+  def validateOptions(params: CaseInsensitiveMap[String]): Unit = {
+    if(!params.get(BatchMockOptions.SCHEMA_CLASS_NAME).isDefined){
+      throw new IllegalArgumentException("schema class is missing")
+    }
+    if(!params.get(BatchMockOptions.DATA_GEN_OBJECT_NAME).isDefined){
+      throw new IllegalArgumentException("data generation object name is missing")
+    }
+  }
+
+  /**
+   * get encoder based on given schema class name
+   *
+   * @return
+   */
+  def getEncoder(properties: JMap[String, String]): ExpressionEncoder[Any] = {
+    // get schema class type for which we are trying to generate data
+    val schemaClassType: universe.Type = BatchMockOptions.getSchemaClassType(properties)
+    // get schema class for which we are trying to generate data
+     val schemaClass: Class[_] = getSchemaClass(schemaClassType)
+    val serializer: Expression = ScalaReflection.serializerForType(schemaClassType)
+    val deserializer = ScalaReflection.deserializerForType(schemaClassType)
+    new ExpressionEncoder[Any](
+      serializer,
+      deserializer,
+      ClassTag(schemaClass))
+  }
+
+  /**
+   * get schema class from options
+   * @param properties
+   * @return
+   */
+  def getSchemaClass(properties: JMap[String, String]): Class[_] = {
+    // get schema class type for which we are trying to generate data
+    val schemaClassType: universe.Type = BatchMockOptions.getSchemaClassType(properties)
+    // get schema class for which we are trying to generate data
+    getSchemaClass(schemaClassType)
+  }
+
+  /**
+   * get schema class from given class Type
+   * @param properties
+   * @return
+   */
+  def getSchemaClass(classType: universe.Type): Class[_] = {
+    // get schema class for which we are trying to generate data
+    ScalaReflection.mirror.runtimeClass(classType)
+  }
+
+
+  /**
+   * get mock unit based on schema class and object name
+   * @param properties
+   * @param seedValue
+   * @param index
+   * @return
+   */
+  def getMockUnit(properties: JMap[String, String], seedValue:Long=1, index:Int=1): MockUnit[BaseDataGen] = {
+    val schemaClass: Class[_] = getSchemaClass(properties)
+    val objName: String = getDataGenObjectName(properties)
+    val mockNeat = new MockNeat(RandomType.SECURE, seedValue)
+    ReflectionUtil.getMockUnit(objName,schemaClass,mockNeat,1)
+  }
 }

@@ -1,7 +1,7 @@
 # Custom Data Source
 This project provides library to create mock data using [MockNeat](https://www.mockneat.com/) and Spark Data Source V2 API.
 
-It is useful in case you would like to test your spark application with the custom business model and would like to generate random data generation.
+It is useful in case you would like to test your spark application with the custom business model (Transactional and/or Master data) and would like to generate random deterministic data generation.
 
 ## Batch DataSource
 
@@ -22,7 +22,7 @@ The data source has the following configuration options:
 
 Each partition will have `BatchMockOptions.NUM_OF_RECORDS/BatchMockOptions.NUM_OF_PARTITIONS` records.
 
-The code for generating customer data using Spark:
+The code for generating batch customer data using Spark:
 
 ```scala
 import com.ms.hdi.spark.datasource.mock.batch.BatchMockOptions
@@ -46,9 +46,45 @@ val data: DataFrame = spark.read.
 
 data.show(false)
 ```
-
-
-
 ## Stream Data Source
 
---- Work in progress
+The Stream data source will create data in stream. Developers need to provide business model schema as a Scala case class.
+
+The user can generate data sources based on their business scenario. First, the user needs to provide a business model in the form of a case class and a companion object. The companion object will have a definition of how to generate values for the given business domain using MockNeat.
+
+The data source schema will be derived at run time from the case class; that should extend from [`com.ms.hdi.spark.datasource.model.BaseDataGen`](datasourceutil/src/main/scala/com/ms/hdi/spark/datasource/model/BaseDataGen.scala), and the companion object should extend from [`com.ms.hdi.spark.datasource.model.DataGenObj`](datasourceutil/src/main/scala/com/ms/hdi/spark/datasource/model/DataGenObj.scala).
+
+For example, the customer model is defined using [`com.ms.hdi.spark.datasource.model.example.Customer`](datasourceutil/src/main/scala/com/ms/hdi/spark/datasource/model/example/Customer.scala), and the data generation object is defined by `com.ms.hdi.spark.datasource.model.example.CustomerObj`.
+
+The data source has the following configuration options:
+
+- `StreamMockOptions.SCHEMA_CLASS_NAME` -> case class name for Schema/Model (with full package name)
+- `StreamMockOptions.DATA_GEN_OBJECT_NAME` -> data generation as per Schema/Model (with full package name)
+- `StreamMockOptions.EACH_BATCH_SIZE` -> batch size
+- `StreamMockOptions.BATCH_INTERVAL_MS` -> batch interval
+
+```scala
+
+val sparkConf = new SparkConf()
+sparkConf.set("spark.master", "local")
+
+val spark = SparkSession
+    .builder()
+    .config(sparkConf)
+    .appName("DataGenExample").getOrCreate()
+
+val data: DataFrame = spark.readStream.
+    format(MockDataUtils.STREAM_ALT_NAME).
+    option(StreamMockOptions.EACH_BATCH_SIZE, "20").
+    option(StreamMockOptions.SCHEMA_CLASS_NAME, "com.ms.hdi.spark.datasource.model.example.Customer").
+    option(StreamMockOptions.DATA_GEN_OBJECT_NAME, "com.ms.hdi.spark.datasource.model.example.CustomerObj").
+    option(StreamMockOptions.BATCH_INTERVAL_MS, "1000").load()
+
+data.writeStream
+    .format("console")
+    .outputMode("append")
+    .start()             // Start the computation
+    .awaitTermination()
+```
+
+Developer can extend both Stream and Batch further based on your need.
