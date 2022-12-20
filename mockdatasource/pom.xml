@@ -19,7 +19,7 @@
         <dependency>
             <groupId>hdi.spark</groupId>
             <artifactId>datasourceutil</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
