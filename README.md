@@ -75,10 +75,10 @@ val spark = SparkSession
 
 val data: DataFrame = spark.readStream.
     format(MockDataUtils.STREAM_ALT_NAME).
-    option(StreamMockOptions.EACH_BATCH_SIZE, "20").
-    option(StreamMockOptions.SCHEMA_CLASS_NAME, "com.ms.hdi.spark.datasource.model.example.Customer").
-    option(StreamMockOptions.DATA_GEN_OBJECT_NAME, "com.ms.hdi.spark.datasource.model.example.CustomerObj").
-    option(StreamMockOptions.BATCH_INTERVAL_MS, "1000").load()
+    option(StreamMockOptions.EACH_BATCH_SIZE, "<<batch size>>").
+    option(StreamMockOptions.SCHEMA_CLASS_NAME, "<<your case class full qualified name>>").
+    option(StreamMockOptions.DATA_GEN_OBJECT_NAME, "<<companion object>>").
+    option(StreamMockOptions.BATCH_INTERVAL_MS, "<<interval in milli seconds>>").load()
 
 data.writeStream
     .format("console")
