@@ -119,3 +119,51 @@ We have two options:
   )
 ```
 2. Create a custom MockUnit for the inner object (in this case ```Car``` )
+
+## Installing
+
+### Maven 
+
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+```
+```xml
+<dependency>
+    <groupId>com.github.sethiaarun</groupId>
+    <artifactId>customdatasource</artifactId>
+    <version>TAG</version>
+</dependency>
+```
+
+### SBT
+
+```
+resolvers += "jitpack" at "https://jitpack.io"
+```
+
+```
+libraryDependencies += "com.github.sethiaarun" % "customdatasource" % "TAG"	
+```
+
+### Gradle
+
+```json
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+```json
+dependencies {
+  implementation 'com.github.sethiaarun:customdatasource:TAG'
+}
+```
