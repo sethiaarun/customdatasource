@@ -7,7 +7,7 @@
     <groupId>hdi.spark</groupId>
     <artifactId>customdatasource</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.1</version>
+    <version>1.1.0</version>
     <modules>
         <module>datasourceutil</module>
         <module>mockdatasource</module>
