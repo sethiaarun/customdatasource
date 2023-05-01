@@ -5,13 +5,13 @@ import com.ms.hdi.spark.datasource.util.ReflectionUtil
 import net.andreinc.mockneat.MockNeat
 import net.andreinc.mockneat.abstraction.MockUnit
 import net.andreinc.mockneat.types.enums.RandomType
-import org.apache.spark.sql.catalyst.ScalaReflection
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
-import org.apache.spark.sql.catalyst.expressions.Expression
 import org.apache.spark.sql.catalyst.util.CaseInsensitiveMap
+import org.apache.spark.sql.{Encoder, Encoders}
 
-import scala.reflect.ClassTag
+import scala.reflect.api
 import scala.reflect.runtime.universe
+import scala.reflect.runtime.universe._
 
 trait MockOptions {
 
@@ -57,16 +57,33 @@ trait MockOptions {
 
   /**
    * validate all mandatory required options
+   *
    * @param params
    * @return
    */
   def validateOptions(params: CaseInsensitiveMap[String]): Unit = {
-    if(!params.get(BatchMockOptions.SCHEMA_CLASS_NAME).isDefined){
+    if (!params.get(BatchMockOptions.SCHEMA_CLASS_NAME).isDefined) {
       throw new IllegalArgumentException("schema class is missing")
     }
-    if(!params.get(BatchMockOptions.DATA_GEN_OBJECT_NAME).isDefined){
+    if (!params.get(BatchMockOptions.DATA_GEN_OBJECT_NAME).isDefined) {
       throw new IllegalArgumentException("data generation object name is missing")
     }
+  }
+
+
+  /**
+   * get type tag from given type
+   * @param tpe
+   * @tparam T
+   * @return
+   */
+  private def backward[T](tpe: Type): TypeTag[T] = {
+    val mirror = universe.runtimeMirror(getClass.getClassLoader)
+    TypeTag(mirror, new api.TypeCreator {
+      def apply[U <: api.Universe with Singleton](m: api.Mirror[U]) =
+        if (m eq mirror) tpe.asInstanceOf[U#Type]
+        else throw new IllegalArgumentException(s"Type tag defined in $ReflectionUtil.mirror cannot be migrated to other mirrors.")
+    })
   }
 
   /**
@@ -77,50 +94,41 @@ trait MockOptions {
   def getEncoder(properties: JMap[String, String]): ExpressionEncoder[Any] = {
     // get schema class type for which we are trying to generate data
     val schemaClassType: universe.Type = BatchMockOptions.getSchemaClassType(properties)
-    // get schema class for which we are trying to generate data
-     val schemaClass: Class[_] = getSchemaClass(schemaClassType)
-    val serializer: Expression = ScalaReflection.serializerForType(schemaClassType)
-    val deserializer = ScalaReflection.deserializerForType(schemaClassType)
-    new ExpressionEncoder[Any](
-      serializer,
-      deserializer,
-      ClassTag(schemaClass))
+    val typeTag: ru.TypeTag[Product] = backward(schemaClassType).asInstanceOf[TypeTag[Product]]
+    val encoder: Encoder[Product] = Encoders.product(typeTag)
+    encoder.asInstanceOf[ExpressionEncoder[Any]]
   }
+
 
   /**
    * get schema class from options
+   *
    * @param properties
    * @return
    */
   def getSchemaClass(properties: JMap[String, String]): Class[_] = {
+    val mirror = universe.runtimeMirror(getClass.getClassLoader)
     // get schema class type for which we are trying to generate data
     val schemaClassType: universe.Type = BatchMockOptions.getSchemaClassType(properties)
     // get schema class for which we are trying to generate data
-    getSchemaClass(schemaClassType)
+    mirror.runtimeClass(schemaClassType)
   }
 
-  /**
-   * get schema class from given class Type
-   * @param properties
-   * @return
-   */
-  def getSchemaClass(classType: universe.Type): Class[_] = {
-    // get schema class for which we are trying to generate data
-    ScalaReflection.mirror.runtimeClass(classType)
-  }
+
 
 
   /**
    * get mock unit based on schema class and object name
+   *
    * @param properties
    * @param seedValue
    * @param index
    * @return
    */
-  def getMockUnit(properties: JMap[String, String], seedValue:Long=1, index:Int=1): MockUnit[BaseDataGen] = {
+  def getMockUnit(properties: JMap[String, String], seedValue: Long = 1, index: Int = 1): MockUnit[BaseDataGen] = {
     val schemaClass: Class[_] = getSchemaClass(properties)
     val objName: String = getDataGenObjectName(properties)
     val mockNeat = new MockNeat(RandomType.SECURE, seedValue)
-    ReflectionUtil.getMockUnit(objName,schemaClass,mockNeat,1)
+    ReflectionUtil.getMockUnit(objName, schemaClass, mockNeat, 1)
   }
 }
