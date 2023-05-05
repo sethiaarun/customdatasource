@@ -1,12 +1,9 @@
 package org.apache.spark.sql.mock
 
-import com.ms.hdi.spark.datasource.mock.options.{BatchMockOptions, StreamMockOptions}
+import com.ms.hdi.example.model.BaseDataGen
+import com.ms.hdi.spark.datasource.mock.options.StreamMockOptions
 import com.ms.hdi.spark.datasource.mock.{OffSetLongOffSetConvert, OffSetTypeOfLongOffSet}
-import com.ms.hdi.spark.datasource.model.BaseDataGen
-import com.ms.hdi.spark.datasource.util.ReflectionUtil
-import net.andreinc.mockneat.MockNeat
 import net.andreinc.mockneat.abstraction.MockUnit
-import net.andreinc.mockneat.types.enums.RandomType
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.execution.streaming.{LongOffset, Offset, Source}

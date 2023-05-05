@@ -1,6 +1,6 @@
 package com.ms.hdi.spark.datasource.mock.options
 
-import com.ms.hdi.spark.datasource.model.BaseDataGen
+import com.ms.hdi.example.model.BaseDataGen
 import com.ms.hdi.spark.datasource.util.ReflectionUtil
 import net.andreinc.mockneat.MockNeat
 import net.andreinc.mockneat.abstraction.MockUnit
