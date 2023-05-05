@@ -1,6 +1,7 @@
 package com.ms.hdi.spark.datasource.util
 
-import com.ms.hdi.spark.datasource.model.{BaseDataGen, DataGenObj}
+import com.ms.hdi.example.model.BaseDataGen
+import com.ms.hdi.model.mockobj.DataGenObj
 import net.andreinc.mockneat.MockNeat
 import net.andreinc.mockneat.abstraction.MockUnit
 

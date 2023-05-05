@@ -1,5 +1,6 @@
 package com.ms.hdi.spark.datasource.mock.batch
 
+import com.ms.hdi.model.mockobj.DataGenObj
 import com.ms.hdi.spark.datasource.mock.constants.MockDataUtils
 import com.ms.hdi.spark.datasource.mock.options.BatchMockOptions
 import org.apache.spark.sql.SQLContext
@@ -22,7 +23,7 @@ import scala.reflect.runtime.{universe => ru}
  * So we create DefaultSource class in the package. It should extend *TableProvider** interface.
  * This user can provide various options/configurations to this source with keys provided at [[BatchMockOptions]]
  * Schema case class must extends from [[com.ms.hdi.spark.datasource.model.BaseDataGen]], pass it by [[BatchMockOptions.SCHEMA_CLASS_NAME]]
- * For the defined schema case class, user must provide data generation object, that should extends from [[com.ms.hdi.spark.datasource.model.DataGenObj]]. The
+ * For the defined schema case class, user must provide data generation object, that should extends from [[DataGenObj]]. The
  * object name must be provided by [[BatchMockOptions.DATA_GEN_OBJECT_NAME]]
  */
 class MockDataSource extends TableProvider
